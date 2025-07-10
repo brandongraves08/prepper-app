@@ -42,5 +42,8 @@
     "nodemon": "^3.1.0",
     "prisma": "^5.15.0",
     "supertest": "^6.3.4"
+  },
+  "jest": {
+    "testPathIgnorePatterns": ["/tests/e2e/"]
   }
 }
