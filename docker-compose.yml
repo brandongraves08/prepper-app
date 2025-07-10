@@ -1,0 +1,44 @@
+version: "3.9"
+services:
+  app:
+    build: .
+    container_name: prepper-app
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=file:/app/prisma/dev.db
+      - VLLM_SERVER_URL=http://vllm:8001
+    volumes:
+      - db-data:/app/prisma
+    depends_on:
+      - vllm
+
+  vllm:
+    build:
+      context: ./vllm
+      dockerfile: Dockerfile
+    container_name: prepper-vllm
+    ports:
+      - "8001:8001"
+    environment:
+      - VLLM_MODEL_PATH=${VLLM_MODEL_PATH:-TheBloke/Mistral-7B-Instruct-v0.2-GGUF}
+      - VLLM_SERVER_PORT=8001
+      - VLLM_ENABLE_CORS=true
+    volumes:
+      - ./vllm_server.py:/app/vllm_server.py
+      - model-cache:/root/.cache/huggingface
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+volumes:
+  db-data:
+  model-cache:
+
+# Note: This docker-compose file is compatible with Podman
+# Run with: podman-compose up -d

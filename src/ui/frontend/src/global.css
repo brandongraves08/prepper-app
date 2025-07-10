@@ -1,0 +1,42 @@
+/* Root theme variables */
+:root {
+  --bg: #ffffff;
+  --text: #121212;
+  --primary: #35424a;
+  --primary-text: #ffffff;
+  --border: #ddd;
+}
+
+:root[data-theme='dark'] {
+  --bg: #121212;
+  --text: #e0e0e0;
+  --primary: #1f2a30;
+  --primary-text: #ffffff;
+  --border: #444;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, sans-serif;
+}
+
+nav {
+  background: var(--primary);
+  color: var(--primary-text);
+}
+
+button {
+  cursor: pointer;
+}
+
+table th {
+  background: var(--primary);
+  color: var(--primary-text);
+}
+
+table, th, td {
+  border-color: var(--border);
+}
