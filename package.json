@@ -13,8 +13,8 @@
     "cli": "node src/cli/index.js",
     "prisma": "prisma",
     "migrate": "prisma migrate dev --name init --preview-feature",
-    "test": "jest",
-    "test:e2e": "playwright test",
+    "test": "node node_modules/jest/bin/jest.js",
+    "test:e2e": "node node_modules/@playwright/test/cli.js test",
     "mesh": "node src/cli/mesh.js",
     "ask": "python src/cli/ask.py"
   },
