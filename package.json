@@ -1,0 +1,46 @@
+{
+  "name": "prepper-app",
+  "version": "0.1.0",
+  "description": "Prepper food inventory & supply tracker",
+  "main": "src/index.js",
+  "type": "commonjs",
+  "bin": {
+    "prepper": "./src/cli/index.js"
+  },
+  "scripts": {
+    "dev": "nodemon src/index.js",
+    "start": "node src/index.js",
+    "cli": "node src/cli/index.js",
+    "prisma": "prisma",
+    "migrate": "prisma migrate dev --name init --preview-feature",
+    "test": "jest",
+    "test:e2e": "playwright test",
+    "mesh": "node src/cli/mesh.js",
+    "ask": "python src/cli/ask.py"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.15.0",
+    "axios": "^1.6.7",
+    "commander": "^14.0.0",
+    "dotenv": "^16.5.0",
+    "ejs": "^3.1.9",
+    "express": "^4.19.2",
+    "libp2p": "^0.45.0",
+    "@libp2p/tcp": "^8.0.1",
+    "@libp2p/mdns": "^8.0.0",
+    "@libp2p/webrtc": "^3.2.0",
+    "@libp2p/websockets": "^7.0.0",
+    "@chainsafe/libp2p-noise": "^12.0.1",
+    "@libp2p/mplex": "^8.0.1",
+    "@libp2p/peer-id": "^2.0.1",
+    "openai": "^5.7.0",
+    "vllm": "^0.0.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "@playwright/test": "^1.44.0",
+    "nodemon": "^3.1.0",
+    "prisma": "^5.15.0",
+    "supertest": "^6.3.4"
+  }
+}
