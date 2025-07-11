@@ -4,6 +4,7 @@ const { Command } = require('commander');
 const { askQuestion } = require('./qa');
 const { getSupplyInfo } = require('./supplies');
 const { handleFoodItemCommand } = require('./foodItems');
+const { handleInventoryCommand } = require('./inventory');
 const { handleMeshCommand, printHelp } = require('./mesh');
 
 const program = new Command();
@@ -56,6 +57,25 @@ program
   .action(async (command, options) => {
     try {
       await handleFoodItemCommand(options, command);
+    } catch (error) {
+      console.error('Error:', error.message);
+    }
+  });
+
+program
+  .command('inventory')
+  .description('Manage food stock entries')
+  .argument('<command>', 'Command to execute: add, eat, list, days-left')
+  .option('--upc <code>', 'UPC/EAN code of product')
+  .option('--qty <number>', 'Quantity of units', '1')
+  .option('--location-id <id>', 'Location ID')
+  .option('--expiry <date>', 'Expiry date (YYYY-MM-DD)')
+  .option('--notes <text>', 'Notes')
+  .option('--stock-id <id>', 'Stock ID (for eat)')
+  .option('--servings <number>', 'Servings eaten (for eat)')
+  .action(async (command, options) => {
+    try {
+      await handleInventoryCommand(command, options);
     } catch (error) {
       console.error('Error:', error.message);
     }

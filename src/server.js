@@ -2,7 +2,14 @@ const express = require('express');
 const path = require('path');
 const prisma = require('./db/client');
 const axios = require('axios');
-const setupMeshNetworking = require('./mesh/server');
+const { searchFoods } = require('./inventory/nutritionService');
+let setupMeshNetworking;
+try {
+  setupMeshNetworking = require('./mesh/server');
+} catch (err) {
+  console.warn('Mesh networking disabled:', err.message);
+}
+
 
 
 const app = express();
@@ -11,6 +18,39 @@ const PORT = process.env.PORT || 3000;
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// --- API Routes ---
+// People CRUD (minimal for tests)
+app.get('/api/people', async (_req, res) => {
+  const people = await prisma.person.findMany();
+  res.json(people);
+});
+
+app.post('/api/people', async (req, res) => {
+  try {
+    const person = await prisma.person.create({ data: req.body });
+    res.status(201).json(person);
+  } catch (e) {
+    res.status(400).json({ error: e.message });
+  }
+});
+
+// Food stock routes
+const stockRoutes = require('./routes/stockRoutes');
+app.use('/stock', stockRoutes);
+
+// Food search endpoint
+app.get('/api/foods/search', async (req, res) => {
+  const q = req.query.q;
+  if (!q) return res.json([]);
+  try {
+    const results = await searchFoods(q, 20);
+    res.json(results);
+  } catch (err) {
+    console.error('Food search error', err);
+    res.status(500).json({ error: 'search_failed' });
+  }
+});
 
 // Helper function to generate HTML layout
 function generateHTML(title, content) {
@@ -122,6 +162,7 @@ function generateHTML(title, content) {
         <a href="/">Home</a>
         <a href="/inventory">Food Inventory</a>
         <a href="/inventory/add">Add Food Item</a>
+        <a href="/stock">Stock</a>
         <a href="/ask">Ask a Question</a>
       </nav>
       <div class="container">
@@ -382,15 +423,23 @@ app.post('/ask', async (req, res) => {
   }
 });
 
-// Initialize mesh networking
-const meshApi = setupMeshNetworking(app, {
-  dataDir: path.join(__dirname, '..', 'data', 'mesh')
-});
+// Initialize mesh networking (optional)
+let meshApi;
+if (typeof setupMeshNetworking === 'function') {
+  meshApi = setupMeshNetworking(app, {
+    dataDir: path.join(__dirname, '..', 'data', 'mesh')
+  });
+}
 
 // Start server
-const server = app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
+let server;
+if (process.env.NODE_ENV !== 'test') {
+  server = app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+  });
+}
+
+module.exports = app;
 
 // Graceful shutdown
 process.on('SIGINT', async () => {

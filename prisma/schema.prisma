@@ -13,6 +13,7 @@ model Person {
   age                 Int
   dietaryRestrictions String?
   dailyConsumption    Int     // calories per day
+  consumptionPlans    ConsumptionPlan[]
 }
 
 model Category {
@@ -21,6 +22,7 @@ model Category {
   description String?
   foodItems   FoodItem[]
   supplies    Supply[]
+  foods       Food[]
 }
 
 model Location {
@@ -29,6 +31,7 @@ model Location {
   description String?
   foodItems   FoodItem[]
   supplies    Supply[]
+  stocks      Stock[]
 }
 
 model FoodItem {
@@ -42,6 +45,8 @@ model FoodItem {
   protein         Float?    // grams per unit
   carbs           Float?    // grams per unit
   fat             Float?    // grams per unit
+  servingSize       Float?    // grams per serving
+  servingsPerUnit   Float?    // number of servings per unit
   barcode         String?   // for barcode scanning
   notes           String?
   // Relations
@@ -49,6 +54,64 @@ model FoodItem {
   category        Category?  @relation(fields: [categoryId], references: [id])
   locationId      Int?
   location        Location?  @relation(fields: [locationId], references: [id])
+}
+
+// -----------------------------
+// New Food Inventory Models
+// -----------------------------
+
+model Food {
+  id          Int            @id @default(autoincrement())
+  name        String
+  brand       String?
+  upc         String?         @unique
+  categoryId  Int?
+  category    Category?       @relation(fields: [categoryId], references: [id])
+  nutrition   NutritionFact?
+  stocks      Stock[]
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+}
+
+model NutritionFact {
+  id            Int      @id @default(autoincrement())
+  foodId        Int      @unique
+  food          Food     @relation(fields: [foodId], references: [id])
+  calories      Float
+  protein       Float
+  carbs         Float
+  fat           Float
+  fiber         Float?
+  sodium        Float?
+  servingSize   Float?   // grams
+  servingsPerUnit Float? // number of servings per unit
+  fetchedAt     DateTime @default(now())
+}
+
+model Stock {
+  id               Int       @id @default(autoincrement())
+  foodId           Int
+  food             Food      @relation(fields: [foodId], references: [id])
+  quantity         Int       // number of units on hand
+  locationId       Int?
+  location         Location? @relation(fields: [locationId], references: [id])
+  expiryDate       DateTime?
+  servingsRemaining Float?
+  notes            String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  consumptionPlans ConsumptionPlan[]
+}
+
+model ConsumptionPlan {
+  id             Int      @id @default(autoincrement())
+  personId       Int
+  person         Person   @relation(fields: [personId], references: [id])
+  stockId        Int
+  stock          Stock    @relation(fields: [stockId], references: [id])
+  servingsPerDay Float
+  startDate      DateTime @default(now())
+  endDate        DateTime?
 }
 
 model Supply {

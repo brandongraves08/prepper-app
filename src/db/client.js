@@ -7,11 +7,13 @@ const prisma = new PrismaClient();
 const ENCRYPT_MAP = {
   FoodItem: ['notes'],
   Supply: ['notes'],
+  Stock: ['notes'],
   Person: ['dietaryRestrictions'],
 };
 
-// Middleware to encrypt before write and decrypt after read
-prisma.$use(async (params, next) => {
+// Attach encryption middleware only if supported (Prisma <5.0)
+if (typeof prisma.$use === 'function') {
+  prisma.$use(async (params, next) => {
   const fields = ENCRYPT_MAP[params.model] || [];
 
   // Encrypt on write-like operations
@@ -45,6 +47,7 @@ prisma.$use(async (params, next) => {
     return result.map(decryptRecord);
   }
   return decryptRecord(result);
-});
+  });
+}
 
 module.exports = prisma;

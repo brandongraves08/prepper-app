@@ -2,14 +2,14 @@
   "name": "prepper-app",
   "version": "0.1.0",
   "description": "Prepper food inventory & supply tracker",
-  "main": "src/index.js",
+  "main": "src/server.js",
   "type": "commonjs",
   "bin": {
     "prepper": "./src/cli/index.js"
   },
   "scripts": {
-    "dev": "nodemon src/index.js",
-    "start": "node src/index.js",
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js",
     "cli": "node src/cli/index.js",
     "prisma": "prisma",
     "migrate": "prisma migrate dev --name init --preview-feature",
@@ -35,6 +35,9 @@
     "@libp2p/peer-id": "^2.0.1",
     "openai": "^5.7.0",
     "vllm": "^0.0.0"
+  },
+  "jest": {
+    "testPathIgnorePatterns": ["tests/e2e"]
   },
   "devDependencies": {
     "jest": "^29.7.0",
