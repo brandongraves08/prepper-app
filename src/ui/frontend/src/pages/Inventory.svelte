@@ -3,16 +3,21 @@
   let items = [];
   let loading = false;
   let error = '';
+  let daysLeft = null;
 
   async function load() {
     loading = true;
-    const res = await window.prepper.listInventory();
+    const [inv, dur] = await Promise.all([
+      window.prepper.listInventory(),
+      window.prepper.getSupplyDuration()
+    ]);
     loading = false;
-    if (res.ok) {
-      items = res.items;
+    if (inv.ok) {
+      items = inv.items;
+      daysLeft = dur.days;
       error = '';
     } else {
-      error = res.error;
+      error = inv.error;
     }
   }
 
@@ -30,6 +35,15 @@
     }
   }
 
+  async function remove(id) {
+    const res = await window.prepper.deleteInventory(id);
+    if (res.ok) {
+      items = items.filter(i => i.id !== id);
+    } else {
+      error = res.error;
+    }
+  }
+
   onMount(load);
 </script>
 
@@ -40,6 +54,9 @@
 </style>
 
 <h2>Inventory</h2>
+{#if daysLeft !== null}
+  <p><strong>{daysLeft}</strong> day{daysLeft==1?'':'s'} of food remaining</p>
+{/if}
 
 <!-- Add Item Form -->
 <div style="margin:1rem 0; border:1px solid #ddd; padding:0.5rem;">
@@ -62,6 +79,7 @@
         <th>Qty</th>
         <th>Unit</th>
         <th>Expiry</th>
+        <th></th>
       </tr>
     </thead>
     <tbody>
@@ -71,6 +89,7 @@
           <td>{item.quantity}</td>
           <td>{item.unit}</td>
           <td>{item.expiryDate?.slice(0,10) || ''}</td>
+          <td><button on:click={() => remove(item.id)}>Delete</button></td>
         </tr>
       {/each}
     </tbody>

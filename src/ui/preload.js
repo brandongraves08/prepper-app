@@ -9,4 +9,6 @@ contextBridge.exposeInMainWorld('prepper', {
   syncMesh: () => ipcRenderer.invoke('mesh-sync'),
   listInventory: () => ipcRenderer.invoke('inventory-list'),
   addInventory: (item) => ipcRenderer.invoke('inventory-add', item),
+  deleteInventory: (id) => ipcRenderer.invoke('inventory-delete', id),
+  getSupplyDuration: () => ipcRenderer.invoke('supply-duration'),
 });
