@@ -79,6 +79,28 @@ ipcMain.handle('inventory-add', async (_e, item) => {
   }
 });
 
+ipcMain.handle('inventory-delete', async (_e, id) => {
+  try {
+    await meshApi.prisma.foodItem.delete({ where: { id } });
+    return { ok: true };
+  } catch (err) {
+    return { ok: false, error: err.message };
+  }
+});
+
+ipcMain.handle('supply-duration', async () => {
+  try {
+    const people = await meshApi.prisma.person.findMany();
+    const totalDaily = people.reduce((s, p) => s + p.dailyConsumption, 0);
+    const items = await meshApi.prisma.foodItem.findMany();
+    const calories = items.reduce((s, f) => s + f.quantity * f.caloriesPerUnit, 0);
+    const days = totalDaily ? Math.floor(calories / totalDaily) : 0;
+    return { days };
+  } catch (err) {
+    return { days: 0 };
+  }
+});
+
 app.whenReady().then(() => {
   createWindow();
 
