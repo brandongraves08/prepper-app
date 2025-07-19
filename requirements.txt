@@ -4,3 +4,4 @@ uvicorn[standard]==0.29.0
 vllm==0.4.3
 psutil==5.9.8
 requests==2.32.3
+pyserial==3.5

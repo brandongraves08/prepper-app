@@ -6,6 +6,7 @@ const { getSupplyInfo } = require('./supplies');
 const { handleFoodItemCommand } = require('./foodItems');
 const { handleInventoryCommand } = require('./inventory');
 const { handleMeshCommand, printHelp } = require('./mesh');
+const { handleRadioCommand } = require('./radio');
 
 const program = new Command();
 
@@ -94,6 +95,19 @@ program
       if (command === 'start') {
         console.log('\nFor more information, use: prepper mesh --help');
       }
+    }
+  });
+
+program
+  .command('radio')
+  .description('Send or receive bulletins via SDR')
+  .argument('<command>', 'Command to execute: send or listen')
+  .option('-m, --message <text>', 'Message to send when using send command')
+  .action(async (command, options) => {
+    try {
+      await handleRadioCommand(options, command);
+    } catch (error) {
+      console.error('Error:', error.message);
     }
   });
 
